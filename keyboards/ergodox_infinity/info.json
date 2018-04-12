@@ -1,5 +1,6 @@
 {
     "keyboard_name": "Infinity Ergodox",
+    "bootloader": "KIIBOHD_BOOTLOADER",
     "width": 19.5,
     "height": 9.375,
     "layouts": {

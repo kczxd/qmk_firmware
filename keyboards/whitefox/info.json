@@ -1,6 +1,8 @@
 {
   "keyboard_name": "Whitefox",
+  "url": "",
   "maintainer": "qmk",
+  "bootloader": "",
   "width": 16,
   "height": 5,
   "layouts": {

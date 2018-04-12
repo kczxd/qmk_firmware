@@ -2,6 +2,7 @@
     "keyboard_name": "CB 2x1800", 
     "url": "", 
     "maintainer": "skullydazed", 
+    "bootloader": "teensy", 
     "width": 24, 
     "height": 6.5, 
     "layouts": {

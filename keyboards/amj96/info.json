@@ -2,6 +2,7 @@
   "keyboard_name": "AMJ96",
   "url": "",
   "maintainer": "qmk",
+  "bootloader": "atmel-dfu",
   "width": 19,
   "height": 6,
   "layouts": {
