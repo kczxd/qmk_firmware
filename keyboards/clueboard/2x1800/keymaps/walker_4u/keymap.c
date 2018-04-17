@@ -20,6 +20,13 @@
 float tone_my_startup[][2] = SONG(ODE_TO_JOY);
 float tone_my_goodbye[][2] = SONG(ROCK_A_BYE_BABY);
 
+const uint8_t RGBLED_BREATHING_INTERVALS[] PROGMEM = {15, 5, 1, 0};
+const uint8_t RGBLED_RAINBOW_MOOD_INTERVALS[] PROGMEM = {40, 20, 5};
+const uint8_t RGBLED_RAINBOW_SWIRL_INTERVALS[] PROGMEM = {40, 10, 5};
+const uint8_t RGBLED_SNAKE_INTERVALS[] PROGMEM = {40, 10, 1};
+const uint8_t RGBLED_KNIGHT_INTERVALS[] PROGMEM = {40, 15, 1};
+const uint16_t RGBLED_GRADIENT_RANGES[] PROGMEM = {360, 240, 180, 120, 90};
+
 float tone_audio_on[][2]   = SONG(CLOSE_ENCOUNTERS_5_NOTE);
 float tone_music_on[][2]   = SONG(DOE_A_DEER);
 float tone_caps_on[][2]    = SONG(CAPS_LOCK_ON_SOUND);

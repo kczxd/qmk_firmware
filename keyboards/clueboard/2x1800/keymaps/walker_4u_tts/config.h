@@ -21,4 +21,13 @@
 
 // place overrides here
 #define TTS_PIN C5
+
+#define RGB_DI_PIN C6
+#define RGBLIGHT_ANIMATIONS
+#undef RGBLED_NUM
+#define RGBLED_NUM 39
+#define RGBLIGHT_HUE_STEP 8
+#define RGBLIGHT_SAT_STEP 8
+#define RGBLIGHT_VAL_STEP 8
+
 #endif

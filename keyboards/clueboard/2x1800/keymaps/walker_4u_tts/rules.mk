@@ -59,9 +59,10 @@ COMMAND_ENABLE = yes        # Commands for debug and configuration
 NKRO_ENABLE = yes            # USB Nkey Rollover
 MIDI_ENABLE = no            # MIDI support (+2400 to 4200, depending on config)
 UNICODE_ENABLE = no         # Unicode
-AUDIO_ENABLE = no           # Audio output on port C6
+AUDIO_ENABLE = yes           # Audio output on port C6
 FAUXCLICKY_ENABLE = no      # Use buzzer to emulate clicky switches
 TTS_ENABLE = yes
+RGBLIGHT_ENABLE = yes
 
 USB_HID_DIR = protocol/usb_hid
 ARDUINO_DIR = $(USB_HID_DIR)/arduino-1.0.1
