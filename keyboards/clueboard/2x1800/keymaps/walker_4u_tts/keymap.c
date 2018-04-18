@@ -37,6 +37,8 @@ void tts_add(char *c) {
   for (x=0; x < strlen(c); x++) {
     tts_storage[tts_write] = c[x];
     tts_write = (tts_write == TTS_BUFSIZE - 1 ? 0 : tts_write + 1);
+    if (tts_read == tts_write)
+      tts_read = (tts_read == TTS_BUFSIZE - 1 ? 0 : tts_read + 1);
   }
 }
 
