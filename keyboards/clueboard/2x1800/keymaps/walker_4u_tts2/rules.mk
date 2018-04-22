@@ -12,7 +12,7 @@ MCU = at90usb1286
 #     does not *change* the processor frequency - it should merely be updated to
 #     reflect the processor speed set externally so that the code can use accurate
 #     software delays.
-F_CPU = 16000000L
+F_CPU = 16000000
 
 
 #
@@ -52,12 +52,22 @@ OPT_DEFS += -DBOOTLOADER_SIZE=1024
 #
 BOOTMAGIC_ENABLE = no      # Virtual DIP switch configuration(+1000)
 MOUSEKEY_ENABLE = no       # Mouse keys(+4700)
-EXTRAKEY_ENABLE = no       # Audio control and System control(+450)
+EXTRAKEY_ENABLE = yes       # Audio control and System control(+450)
 CONSOLE_ENABLE = yes        # Console for debug(+400)
 COMMAND_ENABLE = yes        # Commands for debug and configuration
 # if this doesn't work, see here: https://github.com/tmk/tmk_keyboard/wiki/FAQ#nkro-doesnt-work
 NKRO_ENABLE = yes            # USB Nkey Rollover
 MIDI_ENABLE = no            # MIDI support (+2400 to 4200, depending on config)
 UNICODE_ENABLE = no         # Unicode
-AUDIO_ENABLE = no           # Audio output on port C6
+AUDIO_ENABLE = yes           # Audio output on port C6
 FAUXCLICKY_ENABLE = no      # Use buzzer to emulate clicky switches
+TTS_ENABLE = yes
+RGBLIGHT_ENABLE = yes
+
+USB_HID_DIR = protocol/usb_hid
+ARDUINO_DIR = $(USB_HID_DIR)/arduino-1.0.1
+VPATH += $(TMK_DIR)/$(ARDUINO_DIR)/variants/leonardo
+SRC += TTSWrapper.c 
+SRC += TTS/TTS.cpp
+SRC += TTS/analog.c
+SRC += Talkie/talkie.c
