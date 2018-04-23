@@ -15,3 +15,9 @@ SLEEP_LED_ENABLE = no    # Breathing sleep LED during USB suspend
 ifndef QUANTUM_DIR
 	include ../../../../Makefile
 endif
+
+VPATH += "keyboards/contra/keymaps/walker/arduino"
+
+SRC += serial_wrapper.cpp
+SRC += arduino/HardwareSerial.cpp
+SRC += arduino/Print.cpp

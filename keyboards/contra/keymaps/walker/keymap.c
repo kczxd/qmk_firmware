@@ -19,6 +19,7 @@
 #include <avr/io.h>
 #include <timer.h>
 #include "pincontrol.h"
+#include "serial_wrapper.h"
 
 extern keymap_config_t keymap_config;
 
@@ -109,6 +110,7 @@ void solenoid_setup(void) {
 
 void matrix_init_user(void) {
   solenoid_setup();
+  Serial1_begin(9600);
 }
 
 void matrix_scan_user(void) {
@@ -212,6 +214,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         solenoid_toggle();
       }
+      Serial1_println("Testing 123");
       break;
     case SOLENOID_DWELL_MINUS:
       if (record->event.pressed) {
