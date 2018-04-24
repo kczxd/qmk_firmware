@@ -20,7 +20,7 @@
 #include <timer.h>
 #include "pincontrol.h"
 #include "serial_wrapper.h"
-#include "dectalk_songs.h"
+//#include "dectalk_songs.h"
 
 extern keymap_config_t keymap_config;
 
@@ -53,6 +53,11 @@ uint8_t myrandom(uint8_t howbig) {
   return rval;
 }
 
+const char ** get_random_song(void) {
+  return (const char **)NULL;
+}
+
+/*
 const char ** get_random_song(void) {
   uint8_t local_random;
   const char ** result = NULL;
@@ -118,9 +123,14 @@ const char ** get_random_song(void) {
 
   return result;
 }
+*/
 
 void sing_random_song(void) {
   uint8_t i = 0;
+
+  Serial1_println("STesting 123!\n");
+  return;
+
   const char ** random_song = get_random_song();
   const char * random_line = random_song[0];
  
@@ -207,6 +217,7 @@ void solenoid_setup(void) {
 void matrix_init_user(void) {
   solenoid_setup();
   Serial1_begin(9600);
+  Serial1_println("V18");
 }
 
 void matrix_scan_user(void) {
