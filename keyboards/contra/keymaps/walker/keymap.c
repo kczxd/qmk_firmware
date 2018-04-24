@@ -20,6 +20,7 @@
 #include <timer.h>
 #include "pincontrol.h"
 #include "serial_wrapper.h"
+#include "dectalk_songs.h"
 
 extern keymap_config_t keymap_config;
 
@@ -28,12 +29,107 @@ extern keymap_config_t keymap_config;
 #define SOLENOID_MIN_DWELL 4
 #define SOLENOID_PIN F7
 
+#define randadd 53
+#define randmul 181
+#define randmod 167
+
 bool solenoid_enabled = false;
 bool solenoid_on = false;
 bool solenoid_buzz = false;
 bool solenoid_buzzing = false;
 uint16_t solenoid_start = 0;
 uint8_t solenoid_dwell = SOLENOID_DEFAULT_DWELL;
+
+static uint16_t random_value = 157;
+
+uint8_t myrandom(uint8_t howbig) {
+  uint8_t clockbyte=0;
+  clockbyte = TCNT1 % 256;
+  uint8_t rval;
+
+  random_value = ((random_value + randadd) * randmul) % randmod;
+  rval = (random_value ^ clockbyte) % howbig;
+
+  return rval;
+}
+
+const char ** get_random_song(void) {
+  uint8_t local_random;
+  const char ** result = NULL;
+
+  local_random = myrandom(SONG_COUNT);
+
+  switch(local_random) {
+    case 0:
+      result = song0;
+    break;
+    case 1:
+      result = song1;
+    break;
+    case 2:
+      result = song2;
+    break;
+    case 3:
+      result = song3;
+    break;
+    case 4:
+      result = song4;
+    break;
+    case 5:
+      result = song5;
+    break;
+    case 6:
+      result = song6;
+    break;
+    case 7:
+      result = song7;
+    break;
+    case 8:
+      result = song8;
+    break;
+    case 9:
+      result = song9;
+    break;
+    case 10:
+      result = song10;
+    break;
+    case 11:
+      result = song11;
+    break;
+    case 12:
+      result = song12;
+    break;
+    case 13:
+      result = song13;
+    break;
+    case 14:
+      result = song14;
+    break;
+    case 15:
+      result = song15;
+    break;
+    case 16:
+      result = song16;
+    break;
+    case 17:
+      result = song17;
+    break;
+  }
+
+  return result;
+}
+
+void sing_random_song(void) {
+  uint8_t i = 0;
+  const char ** random_song = get_random_song();
+  const char * random_line = random_song[0];
+ 
+  while (random_line[0] != '\0') {
+    Serial1_println((char *)random_line);
+    i++;
+    random_line = random_song[i];
+  }
+}
 
 void solenoid_buzz_on(void) {
   solenoid_buzz = true;
@@ -134,6 +230,7 @@ enum planck_keycodes {
   SOLENOID_DWELL_PLUS,
   SOLENOID_BUZZ_ON,
   SOLENOID_BUZZ_OFF,
+  SING_RANDOM_SONG,
   EXT_PLV
 };
 
@@ -161,7 +258,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 },
 
 [_ADJUST] = {
-  {_______, RESET,   DEBUG,    RGB_TOG, RGB_MOD, RGB_HUI, RGB_HUD, RGB_SAI, RGB_SAD, RGB_VAI, RGB_VAD, KC_DEL },
+  {SING_RANDOM_SONG, RESET,   DEBUG,    RGB_TOG, RGB_MOD, RGB_HUI, RGB_HUD, RGB_SAI, RGB_SAD, RGB_VAI, RGB_VAD, KC_DEL },
   {_______, _______, MU_MOD,  AU_ON,   AU_OFF,  AG_NORM, AG_SWAP, QWERTY,  _______, _______,  _______,  _______},
   {_______, MUV_DE,  MUV_IN,  MU_ON,   MU_OFF,  MI_ON,   MI_OFF,  TERM_ON, TERM_OFF, RGB_VAD, RGB_VAI, SOLENOID_TOG},
   {_______, _______, _______, _______, _______, _______, _______, _______, SOLENOID_BUZZ_OFF, SOLENOID_BUZZ_ON, SOLENOID_DWELL_MINUS, SOLENOID_DWELL_PLUS}
@@ -177,6 +274,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   }
 
   switch (keycode) {
+    case SING_RANDOM_SONG:
+      if (record->event.pressed) {
+        sing_random_song();
+      }
+      break;
     case LOWER:
       if (record->event.pressed) {
         layer_on(_LOWER);
@@ -214,7 +316,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         solenoid_toggle();
       }
-      Serial1_println("Testing 123");
       break;
     case SOLENOID_DWELL_MINUS:
       if (record->event.pressed) {
