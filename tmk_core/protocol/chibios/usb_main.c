@@ -560,28 +560,17 @@ static const USBConfig usbcfg = {
  * Initialize the USB driver
  */
 void init_usb_driver(USBDriver *usbp) {
-mikedebug(0);
   for (int i=0; i<NUM_STREAM_DRIVERS;i++) {
     SerialUSBDriver* driver = &drivers.array[i].driver;
-mikedebug(1);
     drivers.array[i].in_ep_config.in_state = &drivers.array[i].in_ep_state;
-mikedebug(2);
     drivers.array[i].out_ep_config.out_state = &drivers.array[i].out_ep_state;
-mikedebug(3);
     drivers.array[i].int_ep_config.in_state = &drivers.array[i].int_ep_state;
-mikedebug(4);
     sduObjectInit(driver);
-mikedebug(5);
     bqnotify_t notify = driver->ibqueue.notify;
-mikedebug(6);
     ibqObjectInit(&driver->ibqueue, false, drivers.array[i].queue_buffer_in, drivers.array[i].in_ep_config.in_maxsize, drivers.array[i].queue_capacity_in, notify, driver);
-mikedebug(7);
     notify = driver->obqueue.notify;
-mikedebug(8);
     ibqObjectInit(&driver->ibqueue, false, drivers.array[i].queue_buffer_out, drivers.array[i].out_ep_config.out_maxsize, drivers.array[i].queue_capacity_out, notify, driver);
-mikedebug(9);
     sduStart(driver, &drivers.array[i].config);
-mikedebug(10);
   }
 
   /*
@@ -589,17 +578,12 @@ mikedebug(10);
    * Note, a delay is inserted in order to not have to disconnect the cable
    * after a reset.
    */
-  mikedebug(11);
   usbDisconnectBus(usbp);
-  mikedebug(12);
   wait_ms(1500);
   usbStart(usbp, &usbcfg);
-  mikedebug(13);
   usbConnectBus(usbp);
 
-  mikedebug(14);
   chVTObjectInit(&keyboard_idle_timer);
-  mikedebug(15);
 }
 
 /* ---------------------------------------------------------

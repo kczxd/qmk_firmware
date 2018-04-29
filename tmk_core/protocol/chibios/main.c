@@ -157,7 +157,6 @@ int main(void) {
   wait_ms(50);
 
   print("USB configured.\n");
-
   /* init TMK modules */
   keyboard_init();
   host_set_driver(driver);

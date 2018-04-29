@@ -8,7 +8,7 @@ SRC =	matrix.c \
 # - For Teensies, FAMILY = KINETIS and SERIES is either
 #   KL2x (LC) or K20x (3.0,3.1,3.2).
 MCU_FAMILY = KINETIS
-MCU_SERIES = K60x
+MCU_SERIES = MK66F18
 
 # Linker script to use
 # - it should exist either in <chibios>/os/common/ports/ARMCMx/compilers/GCC/ld/
@@ -26,7 +26,7 @@ MCU_LDSCRIPT = MK66FX1M0
 #   - kl2x for Teensy LC
 #   - k20x5 for Teensy 3.0
 #   - k20x7 for Teensy 3.1 and 3.2
-MCU_STARTUP = k60x7
+MCU_STARTUP = MK66F18
 
 # Board: it should exist either in <chibios>/os/hal/boards/
 #  or <this_dir>/boards
@@ -43,3 +43,5 @@ MCU  = cortex-m4
 # ARM version, CORTEX-M0/M1 are 6, CORTEX-M3/M4/M7 are 7
 # I.e. 6 for Teensy LC; 7 for Teensy 3.x
 ARMV = 7
+
+CUSTOM_MATRIX = yes # Custom matrix file
