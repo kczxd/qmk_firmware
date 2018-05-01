@@ -515,6 +515,31 @@
 
 /** @} */
 
+/**
+ * @brief   Additional definitions required by ChibiOS
+ * @details Please refer to ChibiOS documentation
+ */
+#define CH_CFG_INTERVALS_SIZE               32
+#define CH_CFG_TIME_TYPES_SIZE              32
+#define CH_CFG_USE_OBJ_FIFOS                TRUE
+#define CH_CFG_USE_FACTORY                  FALSE
+#define CH_CFG_FACTORY_MAX_NAMES_LENGTH     8
+#define CH_CFG_FACTORY_OBJECTS_REGISTRY     FALSE
+#define CH_CFG_FACTORY_GENERIC_BUFFERS      FALSE
+#define CH_CFG_FACTORY_SEMAPHORES           FALSE
+#define CH_CFG_FACTORY_MAILBOXES            FALSE
+#define CH_CFG_FACTORY_OBJ_FIFOS            FALSE
+#define PAL_USE_CALLBACKS                   FALSE
+#define PAL_USE_WAIT                        FALSE
+#define CH_CFG_SYSTEM_INIT_HOOK(tp)         {}
+#define CH_CFG_SYSTEM_EXTRA_FIELDS
+#define ST2MS(n) (((n) * 1000UL + CH_CFG_ST_FREQUENCY - 1UL) /              \
+                  CH_CFG_ST_FREQUENCY)
+#define MS2ST(msec)                                                         \
+  ((systime_t)(((((uint32_t)(msec)) *                                       \
+                 ((uint32_t)CH_CFG_ST_FREQUENCY)) + 999UL) / 1000UL))
+
+
 /*===========================================================================*/
 /* Port-specific settings (override port settings defaulted in chcore.h).    */
 /*===========================================================================*/
