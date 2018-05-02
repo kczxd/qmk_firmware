@@ -25,7 +25,7 @@ If you're not using git, you can just download a [zip of chibios from here](http
 
 (Why do we need chibios-contrib? Well, the main repo focuses on STM32 chips, and Freescale/NXP Kinetis chips are supported via the Contrib repository.)
 
-This should be it. Running `make` in `keyboard/teensy_lc_onekey` should create a working firmware in `build/`, called `ch.hex`.
+This should be it. Running `make` in `keyboard/teensy_3_6_onekey` should create a working firmware in `build/`, called `ch.hex`.
 
 For more notes about the ChibiOS backend in TMK, see `tmk_core/protocol/chibios/README.md`.
 

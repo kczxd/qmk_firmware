@@ -64,6 +64,5 @@
  * USB driver settings
  */
 #define KINETIS_USB_USE_USB0                  TRUE
-#define KINETIS_USB_USB0_IRQ_PRIORITY         2
 
 #endif
