@@ -23,3 +23,16 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 const uint16_t fn_actions[] = {
 };
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
+  switch (keycode) {
+    case KC_CAPS:
+      if (record->event.pressed) {
+          printf("Hello, world!\n");
+      }
+      break;
+  }
+
+  return true;
+}
