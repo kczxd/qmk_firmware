@@ -21,7 +21,7 @@
  * HAL driver system settings.
  */
 
-#if 1
+#if 0
 /* PEE mode - 120MHz system clock driven by external crystal. */
 #define KINETIS_MCG_MODE             KINETIS_MCG_MODE_PEE
 #define KINETIS_PLLCLK_FREQUENCY     180000000UL
@@ -73,6 +73,20 @@
 #define KINETIS_CLKDIV1_OUTDIV4     2
 #define KINETIS_BUSCLK_FREQUENCY    KINETIS_SYSCLK_FREQUENCY
 #define KINETIS_FLASHCLK_FREQUENCY  KINETIS_SYSCLK_FREQUENCY/2
+#endif
+
+#if 1
+/* FEI mode - 96 MHz with internal 32.768 kHz crystal */
+#define KINETIS_MCG_MODE            KINETIS_MCG_MODE_FEI
+#define KINETIS_MCG_FLL_DMX32       1           /* Fine-tune for 32.768 kHz */
+#define KINETIS_MCG_FLL_DRS         1           /* 2929x FLL factor */
+#define KINETIS_SYSCLK_FREQUENCY    95977472UL  /* 32.768 kHz * 2929 (~96 MHz) */
+#define KINETIS_CLKDIV1_OUTDIV1     1
+#define KINETIS_CLKDIV1_OUTDIV2     2 /* ~48MHz bus clock */
+#define KINETIS_CLKDIV1_OUTDIV3     2 /* ~48MHz FlexBus clock */
+#define KINETIS_CLKDIV1_OUTDIV4     4 /* ~24MHz flash clock */
+#define KINETIS_BUSCLK_FREQUENCY    KINETIS_SYSCLK_FREQUENCY/2
+#define KINETIS_FLASHCLK_FREQUENCY  KINETIS_SYSCLK_FREQUENCY/4
 #endif
 
 /*
