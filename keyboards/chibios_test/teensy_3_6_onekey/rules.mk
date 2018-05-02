@@ -6,7 +6,7 @@ SRC =	matrix.c \
 # - the next two should match the directories in
 #   <chibios>/os/hal/ports/$(MCU_FAMILY)/$(MCU_SERIES)
 # - For Teensies, FAMILY = KINETIS and SERIES is either
-#   KL2x (LC) or K20x (3.0,3.1,3.2).
+#   KL2x (LC), K20x (3.0,3.1,3.2), or MK66F18 (3.6)
 MCU_FAMILY = KINETIS
 MCU_SERIES = MK66F18
 
@@ -18,6 +18,7 @@ MCU_SERIES = MK66F18
 #   - MKL26Z64 for Teensy LC
 #   - MK20DX128 for Teensy 3.0
 #   - MK20DX256 for Teensy 3.1 and 3.2
+#   - MK66FX1M0 for Teensy 3.6
 MCU_LDSCRIPT = MK66FX1M0
 
 # Startup code to use
@@ -26,6 +27,7 @@ MCU_LDSCRIPT = MK66FX1M0
 #   - kl2x for Teensy LC
 #   - k20x5 for Teensy 3.0
 #   - k20x7 for Teensy 3.1 and 3.2
+#   - MK66F18 for Teensy 3.6
 MCU_STARTUP = MK66F18
 
 # Board: it should exist either in <chibios>/os/hal/boards/
@@ -34,6 +36,7 @@ MCU_STARTUP = MK66F18
 #   - PJRC_TEENSY_LC for Teensy LC
 #   - PJRC_TEENSY_3 for Teensy 3.0
 #   - PJRC_TEENSY_3_1 for Teensy 3.1 or 3.2
+#   - PJRC_TEENSY_3_6 for Teensy 3.6
 BOARD = PJRC_TEENSY_3_6
 
 # Cortex version

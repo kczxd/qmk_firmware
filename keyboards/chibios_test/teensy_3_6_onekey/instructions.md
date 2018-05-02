@@ -1,4 +1,4 @@
-# Teensy LC, 3.0, 3.1, 3.2 support
+# Teensy LC, 3.0, 3.1, 3.2, and 3.6 support
 
 These ARM Teensies are now supported through [ChibiOS](http://chibios.org).
 
