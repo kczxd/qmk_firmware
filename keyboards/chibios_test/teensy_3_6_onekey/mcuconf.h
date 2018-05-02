@@ -22,15 +22,26 @@
  */
 
 #if 0
-/* PEE mode - 48MHz system clock driven by external crystal. */
-#define KINETIS_MCG_MODE            KINETIS_MCG_MODE_PEE
-#define KINETIS_PLLCLK_FREQUENCY    48000000UL
-#define KINETIS_SYSCLK_FREQUENCY    48000000UL
-#define KINETIS_BUSCLK_FREQUENCY    48000000UL
-#define KINETIS_FLASHCLK_FREQUENCY  24000000UL
+/* PEE mode - 96MHz system clock driven by external crystal. */
+#define KINETIS_MCG_MODE             KINETIS_MCG_MODE_PEE
+#define KINETIS_PLLCLK_FREQUENCY     96000000UL
+#define KINETIS_SYSCLK_FREQUENCY     96000000UL
+#define KINETIS_BUSCLK_FREQUENCY     48000000UL
+#define KINETIS_FLASHCLK_FREQUENCY   24000000UL
+#define KINETIS_FLEXBUSCLK_FREQUENCY 96000000UL
 #endif
 
 #if 1
+/* PEE mode - 48MHz system clock driven by external crystal. */
+#define KINETIS_MCG_MODE             KINETIS_MCG_MODE_PEE
+#define KINETIS_PLLCLK_FREQUENCY     48000000UL
+#define KINETIS_SYSCLK_FREQUENCY     48000000UL
+#define KINETIS_BUSCLK_FREQUENCY     48000000UL
+#define KINETIS_FLASHCLK_FREQUENCY   24000000UL
+#define KINETIS_FLEXBUSCLK_FREQUENCY 48000000UL
+#endif
+
+#if 0
 /* FEI mode - 48 MHz with internal 32.768 kHz crystal */
 #define KINETIS_MCG_MODE            KINETIS_MCG_MODE_FEI
 #define KINETIS_MCG_FLL_DMX32       1           /* Fine-tune for 32.768 kHz */
@@ -44,19 +55,6 @@
 #define KINETIS_FLASHCLK_FREQUENCY  KINETIS_SYSCLK_FREQUENCY/2
 #endif
 
-#if 0
-/* FEI mode - 24 MHz with internal 32.768 kHz crystal */
-#define KINETIS_MCG_MODE            KINETIS_MCG_MODE_FEI
-#define KINETIS_MCG_FLL_DMX32       1           /* Fine-tune for 32.768 kHz */
-#define KINETIS_MCG_FLL_DRS         0           /* 732x FLL factor */
-#define KINETIS_SYSCLK_FREQUENCY    23986176    /* 32.768 kHz * 732 (~24 MHz) */
-#define KINETIS_CLKDIV1_OUTDIV1     1
-#define KINETIS_CLKDIV1_OUTDIV2     1
-#define KINETIS_CLKDIV1_OUTDIV4     1
-#define KINETIS_BUSCLK_FREQUENCY    KINETIS_SYSCLK_FREQUENCY
-#define KINETIS_FLASHCLK_FREQUENCY  KINETIS_SYSCLK_FREQUENCY
-#endif
-
 /*
  * SERIAL driver system settings.
  */
@@ -66,6 +64,6 @@
  * USB driver settings
  */
 #define KINETIS_USB_USE_USB0                  TRUE
-#define KINETIS_USB_USB0_IRQ_PRIORITY         5
+#define KINETIS_USB_USB0_IRQ_PRIORITY         2
 
 #endif
