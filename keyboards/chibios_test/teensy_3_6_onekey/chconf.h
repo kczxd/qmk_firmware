@@ -289,6 +289,7 @@
  * @note    Mutexes are recommended.
  */
 #define CH_CFG_USE_HEAP                     TRUE
+#define CH_CFG_USE_MALLOC_HEAP              TRUE
 
 /**
  * @brief   Memory Pools Allocator APIs.

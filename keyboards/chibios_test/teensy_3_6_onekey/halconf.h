@@ -30,6 +30,10 @@
 
 #include "mcuconf.h"
 
+#define PLATFORM_SDC_USE_SDC1 TRUE
+#define HAL_USE_USBH TRUE
+#define HAL_USBH_USE_MSD TRUE
+
 /**
  * @brief   Enables the PAL subsystem.
  */
@@ -125,7 +129,7 @@
  * @brief   Enables the SDC subsystem.
  */
 #if !defined(HAL_USE_SDC) || defined(__DOXYGEN__)
-#define HAL_USE_SDC                 FALSE
+#define HAL_USE_SDC                 TRUE
 #endif
 
 /**
