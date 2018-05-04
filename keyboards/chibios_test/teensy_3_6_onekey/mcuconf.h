@@ -99,4 +99,48 @@
  */
 #define KINETIS_USB_USE_USB0                  TRUE
 
+/*
+ * I2C settings
+ */
+#define KINETIS_I2C_USE_I2C0                  TRUE
+
+/*
+ * ADC settings
+ */
+#define KINETIS_ADC_USE_ADC0                  TRUE
+
+/*
+ * EXT driver system settings.
+ */
+#define KINETIS_EXTI_NUM_CHANNELS         1
+#define KINETIS_EXT_PORTA_IRQ_PRIORITY          12
+#define KINETIS_EXT_PORTB_IRQ_PRIORITY          12
+#define KINETIS_EXT_PORTC_IRQ_PRIORITY          12
+#define KINETIS_EXT_PORTD_IRQ_PRIORITY          12
+#define KINETIS_EXT_PORTE_IRQ_PRIORITY          12
+
+/* K20 64pin  */
+#define KINETIS_EXT_PORTA_WIDTH                 20
+#define KINETIS_EXT_PORTB_WIDTH                 20
+#define KINETIS_EXT_PORTC_WIDTH                 12
+#define KINETIS_EXT_PORTD_WIDTH                 8
+#define KINETIS_EXT_PORTE_WIDTH                 2
+
+/*
+ * GPT driver system settings.
+ */
+#define KINETIS_GPT_USE_PIT0                TRUE
+#define KINETIS_GPT_PIT0_IRQ_PRIORITY       8
+
+/*
+ * PWM driver system settings.
+ */
+#define KINETIS_PWM_USE_FTM0                  TRUE
+
+/*
+ * SPI driver system settings.
+ */
+#define KINETIS_SPI_USE_SPI0                TRUE
+#define KINETIS_SPI_SPI0_IRQ_PRIORITY       8
+
 #endif
