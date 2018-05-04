@@ -99,8 +99,6 @@
  */
 #define KINETIS_USB_USE_USB0                  TRUE
 
-<<<<<<< HEAD
-=======
 /*
  * I2C settings
  */
