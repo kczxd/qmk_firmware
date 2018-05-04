@@ -40,8 +40,8 @@
  */
 
 
-#if defined(K20x) /* chip selection */
-/* Teensy 3.0, 3.1, 3.2; mchck; infinity keyboard */
+#if defined(K20x) || defined(MK66F18) /* chip selection */
+/* Teensy 3.0, 3.1, 3.2, 3.6; mchck; infinity keyboard */
 
 // The EEPROM is really RAM with a hardware-based backup system to
 // flash memory.  Selecting a smaller size EEPROM allows more wear
