@@ -23,3 +23,4 @@ You can also use any ARM processor that [ChibiOS](http://www.chibios.org) suppor
 * [Kinetis MK20DX128](http://www.nxp.com/assets/documents/data/en/data-sheets/K20P64M50SF0.pdf)
 * [Kinetis MK20DX128](http://www.nxp.com/assets/documents/data/en/data-sheets/K20P64M50SF0.pdf)
 * [Kinetis MK20DX256](http://www.nxp.com/products/microcontrollers-and-processors/arm-processors/kinetis-cortex-m-mcus/k-series-performance-m4/k2x-usb/kinetis-k20-72-mhz-full-speed-usb-mixed-signal-integration-microcontrollers-mcus-based-on-arm-cortex-m4-core:K20_72)
+* [Kinetis MK66FX1M0](https://www.nxp.com/docs/en/reference-manual/K66P144M180SF5RMV2.pdf)

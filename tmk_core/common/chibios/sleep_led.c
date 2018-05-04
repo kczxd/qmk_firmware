@@ -9,7 +9,7 @@
  * Use LP timer on Kinetises, TIM14 on STM32F0.
  */
 
-#if defined(KL2x) || defined(K20x)
+#if defined(KL2x) || defined(K20x) || defined(MK66F18)
 
 /* Use Low Power Timer (LPTMR) */
 #define TIMER_INTERRUPT_VECTOR KINETIS_LPTMR0_IRQ_VECTOR
@@ -23,7 +23,7 @@
 
 #endif
 
-#if defined(KL2x) || defined(K20x) || defined(STM32F0XX) /* common parts for timers/interrupts */
+#if defined(KL2x) || defined(K20x) || defined(STM32F0XX) || defined(MK66F18) /* common parts for timers/interrupts */
 
 /* Breathing Sleep LED brighness(PWM On period) table
  * (64[steps] * 4[duration]) / 64[PWM periods/s] = 4 second breath cycle
@@ -79,7 +79,7 @@ OSAL_IRQ_HANDLER(TIMER_INTERRUPT_VECTOR) {
 #endif /* common parts for known platforms */
 
 
-#if defined(KL2x) || defined(K20x) /* platform selection: familiar Kinetis chips */
+#if defined(KL2x) || defined(K20x) || defined(MK66F18) /* platform selection: familiar Kinetis chips */
 
 /* LPTMR clock options */
 #define LPTMR_CLOCK_MCGIRCLK 0 /* 4MHz clock */
