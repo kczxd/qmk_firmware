@@ -11,6 +11,7 @@
  * @brief   Card monitor timer.
  */
 static virtual_timer_t tmr;
+static bool init_done = FALSE;
 
 /**
  * @brief   Debounce counter.
@@ -21,6 +22,8 @@ static unsigned cnt;
  * @brief   Card event sources.
  */
 static event_source_t inserted_event, removed_event;
+
+int local_fatfs_init(void);
 
 /**
  * @brief   Insertion monitor timer callback function.
@@ -89,8 +92,23 @@ static FRESULT scan_files(char *path) {
   char *fn;
   char buf[80];
 
+  debug("Entering scan_files\n");
+  if(!init_done) local_fatfs_init();
+
+  if(!fs_ready) {
+    debug("Attempt to mount card\n");
+    res = f_mount(&SDC_FS, "/", 1);
+    if (res != FR_OK) {
+      sdcDisconnect(&SDCD1);
+      debug("Failed to mount card!\n");
+      return res;
+    }
+    fs_ready = TRUE;
+  }
+
   res = f_opendir(&dir, path);
   if (res == FR_OK) {
+    debug("opendir succeeded\n");
     i = strlen(path);
     while (((res = f_readdir(&dir, &fno)) == FR_OK) && fno.fname[0]) {
       if (FF_FS_RPATH && fno.fname[0] == '.')
@@ -110,6 +128,9 @@ static FRESULT scan_files(char *path) {
       }
     }
   }
+  else {
+    debug("opendir FAILED\n");
+  }
   return res;
 }
 
@@ -123,18 +144,24 @@ static FRESULT scan_files(char *path) {
 static void InsertHandler(eventid_t id) {
   FRESULT err;
 
+  debug("Insertion detected\n");
   (void)id;
   /*
    * On insertion SDC initialization and FS mount.
    */
-  if (sdcConnect(&SDCD1))
+  if (sdcConnect(&SDCD1)){
+    debug("Connect failed\n");
     return;
+  }
+  debug("Connect succeeded, attempting to mount\n");
 
   err = f_mount(&SDC_FS, "/", 1);
   if (err != FR_OK) {
+    debug("Mount failed\n");
     sdcDisconnect(&SDCD1);
     return;
   }
+  debug("Mount succeeded\n");
   fs_ready = TRUE;
 }
 
@@ -142,34 +169,21 @@ static void InsertHandler(eventid_t id) {
  * Card removal event.
  */
 static void RemoveHandler(eventid_t id) {
-
+  debug("Removal detected\n");
   (void)id;
   sdcDisconnect(&SDCD1);
   fs_ready = FALSE;
 }
 
-/*
- * Green LED blinker thread, times are in milliseconds.
- */
-static THD_WORKING_AREA(waThread1, 128);
-static THD_FUNCTION(Thread1, arg) {
+int local_fatfs_init(void) {
+ // FRESULT err;
 
-  (void)arg;
-  chRegSetThreadName("blinker");
-  while (true) {
-    palToggleLine(LINE_PIN13);
-    chThdSleepMilliseconds(fs_ready ? 125 : 500);
-  }
-}
-
-/*
- * Application entry point.
- */
-int stuff(void) {
   static const evhandler_t evhndl[] = {
     InsertHandler,
     RemoveHandler
   };
+
+  debug("entering local_fatfs_init\n");
   event_listener_t el0, el1;
 
   /*
@@ -180,45 +194,73 @@ int stuff(void) {
    *   RTOS is active.
    * - lwIP subsystem initialization using the default configuration.
    */
-  halInit();
-  chSysInit();
+  //halInit();
+  //chSysInit();
 
   /*
    * Activates the SDC driver 1 using default
    * configuration.
    */
+  debug("doing sdcStart\n");
   sdcStart(&SDCD1, NULL);
 
   /*
    * Activates the card insertion monitor.
    */
+  debug("doing tmr_init\n");
   tmr_init(&SDCD1);
 
-  /*
-   * Creates the blinker thread.
-   */
-  chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
-
-  /*
-   * Normal main() thread activity, handling SD card events
-   * start/exit.
-   */
+  debug("register events\n");
   chEvtRegister(&inserted_event, &el0, 0);
   chEvtRegister(&removed_event, &el1, 1);
+
+  init_done = true;
+
+
+/*
+  debug("done with init, try connect\n");
+  if (sdcConnect(&SDCD1)){
+    debug("Connect failed\n");
+    return -1;
+  }
+
+  debug("Mounting drive\n");
+  err = f_mount(&SDC_FS, "/", 1);
+  if (err != FR_OK) {
+    char buf[64];
+    sprintf(buf, "Mount failed code %d\n", (int)err);
+    debug(buf);
+    sdcDisconnect(&SDCD1);
+    return -1;
+  }
+  fs_ready = TRUE;
+*/
+
   while (true) {
     chEvtDispatch(evhndl, chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(500)));
   }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+//  FRESULT local_result;
+//  char debug_string[64];
+  debug_enable=true;
+  debug("Main entry\n");
+
   switch (keycode) {
     case KC_CAPS:
       if (record->event.pressed) {
-        print("Main debug string\n");
-        scan_files("/");
+        debug("Keypress, about to scan\n");
+        //local_result = scan_files("/");
+        //sprintf(debug_string, "Result: %d\n", (int)local_result);
+        //debug(debug_string);
+        local_fatfs_init();
+        //debug("fatfs init\n");
       }
+      break;
+    case KC_C:
+      scan_files("/");
       break;
   }
   return true;
-
 }

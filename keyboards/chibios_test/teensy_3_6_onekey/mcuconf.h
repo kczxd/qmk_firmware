@@ -61,7 +61,7 @@
 #define KINETIS_FLEXBUSCLK_FREQUENCY 48000000UL
 #endif
 
-#if 0
+#if 1
 /* FEI mode - 48 MHz with internal 32.768 kHz crystal */
 #define KINETIS_MCG_MODE            KINETIS_MCG_MODE_FEI
 #define KINETIS_MCG_FLL_DMX32       1           /* Fine-tune for 32.768 kHz */
@@ -75,7 +75,7 @@
 #define KINETIS_FLASHCLK_FREQUENCY  KINETIS_SYSCLK_FREQUENCY/2
 #endif
 
-#if 1
+#if 0
 /* FEI mode - 96 MHz with internal 32.768 kHz crystal */
 #define KINETIS_MCG_MODE            KINETIS_MCG_MODE_FEI
 #define KINETIS_MCG_FLL_DMX32       1           /* Fine-tune for 32.768 kHz */
