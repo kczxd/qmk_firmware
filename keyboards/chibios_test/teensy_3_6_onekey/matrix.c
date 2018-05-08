@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "matrix.h"
 #include "wait.h"
+#include "teensy_3_6_onekey.h"
 
 #ifndef DEBOUNCE
 #   define DEBOUNCE 5
@@ -60,6 +61,9 @@ uint8_t matrix_cols(void)
 
 void matrix_init(void)
 {
+    debug_enable = true;
+    debug_matrix = true;
+    print("Entering matrix_init\n");
     // initialize row and col
     unselect_rows();
     init_cols();
@@ -70,12 +74,12 @@ void matrix_init(void)
         matrix_debouncing[i] = 0;
     }
 
-    //debug
-    debug_enable = true;
-    debug_matrix = true;
     LED_ON();
-    wait_ms(500);
+    wait_ms(100);
     LED_OFF();
+    print("About to call local_fatfs_init\n");
+    local_fatfs_init(); 
+    print("Done calling local_fatfs_init\n");
 }
 
 uint8_t matrix_scan(void)
@@ -148,7 +152,7 @@ static matrix_row_t read_cols(void)
  */
 static void unselect_rows(void)
 {
-    palSetPadMode(TEENSY_PIN43_IOPORT, TEENSY_PIN43, PAL_MODE_INPUT); // hi-Z
+    palSetPadMode(TEENSY_PIN34_IOPORT, TEENSY_PIN34, PAL_MODE_INPUT); // hi-Z
 }
 
 static void select_row(uint8_t row)
@@ -157,8 +161,8 @@ static void select_row(uint8_t row)
     // Output low to select
     switch (row) {
         case 0:
-            palSetPadMode(TEENSY_PIN43_IOPORT, TEENSY_PIN43, PAL_MODE_OUTPUT_PUSHPULL);
-            palClearPad(TEENSY_PIN43_IOPORT, TEENSY_PIN43);
+            palSetPadMode(TEENSY_PIN34_IOPORT, TEENSY_PIN34, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(TEENSY_PIN34_IOPORT, TEENSY_PIN34);
             break;
     }
 }

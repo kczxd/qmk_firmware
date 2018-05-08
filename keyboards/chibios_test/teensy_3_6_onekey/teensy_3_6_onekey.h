@@ -12,6 +12,7 @@
 
 #include "fatfs/src/ff.h"
 
+int local_fatfs_init(void);
 #define LAYOUT(k00) {{ k00 }}
 
 #endif

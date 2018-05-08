@@ -56,8 +56,6 @@ VPATH += $(LIB_PATH)/chibios-contrib/os/hal/include
 VPATH += $(LIB_PATH)/chibios-contrib/os/hal/include/usbh/dev
 VPATH += fatfs/src
 
-include $(LIB_PATH)/chibios/os/various/fatfs_bindings/fatfs.mk
-
 #SRC += fatfs/src/ffsystem.c
 SRC += fatfs/src/fatfs_diskio.c 
 SRC += fatfs/src/fatfs_syscall.c 
