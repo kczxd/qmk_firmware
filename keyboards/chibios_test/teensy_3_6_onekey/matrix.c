@@ -77,9 +77,9 @@ void matrix_init(void)
     LED_ON();
     wait_ms(100);
     LED_OFF();
-    print("About to call local_fatfs_init\n");
+#if HAL_USE_SDC
     local_fatfs_init(); 
-    print("Done calling local_fatfs_init\n");
+#endif
 }
 
 uint8_t matrix_scan(void)

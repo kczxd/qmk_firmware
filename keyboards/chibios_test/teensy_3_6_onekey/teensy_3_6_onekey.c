@@ -4,11 +4,9 @@
 /* Card insertion monitor.                                                   */
 /*===========================================================================*/
 
-#define POLLING_INTERVAL                10
-#define POLLING_DELAY                   10
-
+#if HAL_USE_SDC
 /*
- * Working area for driver.
+ * Working area for SDHC driver.
  */
 static uint8_t sd_scratchpad[512];
 
@@ -20,19 +18,9 @@ static const SDCConfig sdccfg = {
   SDC_MODE_4BIT
 };
 
-/**
- * @brief   Card monitor timer.
- */
-//static virtual_timer_t tmr;
 static bool init_done = FALSE;
-//static bool inserted = FALSE;
-
-/* FS mounted and ready.*/
 static bool fs_ready = FALSE;
 mutex_t fs_mutex;
-
-//static void InsertHandler(void);
-//static void RemoveHandler(void);
 
 static inline bool is_fs_ready(void) {
   bool res;
@@ -48,73 +36,7 @@ static inline void fs_is_ready(bool res) {
   chMtxUnlock(&fs_mutex);
 }
 
-//static bool toggy = FALSE;
-//#define togger do{ mikedebug((toggy ? 255 : 0)); toggy=!toggy;} while(0)
-
-/**
- * @brief   Debounce counter.
- */
-//static unsigned cnt;
-
-/**
- * @brief   Insertion monitor timer callback function.
- *
- * @param[in] p         pointer to the @p BaseBlockDevice object
- *
- * @notapi
- */
-/*
-static void tmrfunc(void *p) {
-  BaseBlockDevice *bbdp = p;
-
-  chSysLockFromISR();
-  if (cnt > 0) {
-    if (!inserted && blkIsInserted(bbdp)) {
-      if (--cnt == 0) {
-        inserted = TRUE;
-        InsertHandler();
-      }
-    }
-    else
-      cnt = POLLING_INTERVAL;
-  }
-  else {
-    if (inserted && !blkIsInserted(bbdp)) {
-      cnt = POLLING_INTERVAL;
-      inserted = FALSE;
-      RemoveHandler();
-    }
-  }
-  chVTSetI(&tmr, MS2ST(POLLING_DELAY), tmrfunc, bbdp);
-  chSysUnlockFromISR();
-}
-*/
-
-/**
- * @brief   Polling monitor start.
- *
- * @param[in] p         pointer to an object implementing @p BaseBlockDevice
- *
- * @notapi
- */
-/*
-static void tmr_init(void *p) {
-  chSysLock();
-  cnt = POLLING_INTERVAL;
-  chVTSetI(&tmr, MS2ST(POLLING_DELAY), tmrfunc, p);
-  chSysUnlock();
-}
-*/
-
-/*===========================================================================*/
-/* FatFs related.                                                            */
-/*===========================================================================*/
-
-/**
- * @brief FS object.
- */
 static FATFS SDC_FS;
-
 
 static FRESULT scan_files(char *path) {
   static FILINFO fno;
@@ -127,8 +49,6 @@ static FRESULT scan_files(char *path) {
   debug_enable = true;
   debug_matrix = true;
 
-  print("Entering scan_files\n");
-
   if(!init_done) local_fatfs_init();
 
   if(!is_fs_ready()) {
@@ -138,7 +58,7 @@ static FRESULT scan_files(char *path) {
 
   res = f_opendir(&dir, path);
   if (res == FR_OK) {
-    print("opendir succeeded\n");
+    print("Scanning files...\n");
     i = strlen(path);
     while (((res = f_readdir(&dir, &fno)) == FR_OK) && fno.fname[0]) {
       if (FF_FS_RPATH && fno.fname[0] == '.')
@@ -164,52 +84,11 @@ static FRESULT scan_files(char *path) {
   return res;
 }
 
-/*===========================================================================*/
-/* Main and generic code.                                                    */
-/*===========================================================================*/
-
-/*
- * Card insertion event.
- */
-/*
-static void InsertHandler(void) {
-  FRESULT err;
-
-  print("Insertion detected\n");
-  if (sdcConnect(&SDCD1)){
-    print("Connect failed\n");
-    return;
-  }
-  print("Connect succeeded, attempting to mount\n");
-
-  err = f_mount(&SDC_FS, "/", 1);
-  if (err != FR_OK) {
-    print("Mount failed\n");
-    sdcDisconnect(&SDCD1);
-    return;
-  }
-  else {
-  }
-  print("Mount succeeded\n");
-  fs_is_ready(TRUE);
-}
-
-static void RemoveHandler(void) {
-  print("Removal detected\n");
-  sdcDisconnect(&SDCD1);
-  fs_is_ready(FALSE);
-}
-*/
-
 int local_fatfs_init(void) {
   FRESULT err;
   char buf[64];
   chMtxObjectInit(&fs_mutex);
-  print("entering local_fatfs_init\n");
-  print("doing sdcStart\n");
   sdcStart(&SDCD1, &sdccfg);
-  //print("doing tmr_init\n");
-  //tmr_init(&SDCD1);
   init_done = true;
 
   if ((err=sdcConnect(&SDCD1))){
@@ -217,7 +96,6 @@ int local_fatfs_init(void) {
     print(buf);
     return -1;
   }
-  print("Connect succeeded, attempting to mount\n");
 
   err = f_mount(&SDC_FS, "/", 1);
   if (err != FR_OK) {
@@ -227,33 +105,22 @@ int local_fatfs_init(void) {
   }
   else {
   }
-  print("Mount succeeded\n");
   fs_is_ready(TRUE);
-
-
-
-
   return 0;
 }
+#endif //#if defined(HAL_USE_SDC)
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-//  FRESULT local_result;
-//  char debug_string[64];
 
   switch (keycode) {
     case KC_CAPS:
       if (record->event.pressed) {
         print("Keypress\n");
-        //local_result = scan_files("/");
-        //sprintf(debug_string, "Result: %d\n", (int)local_result);
-        //print(debug_string);
-//        local_fatfs_init();
-        //print("fatfs init\n");
-          scan_files("/");
+#if HAL_USE_SDC
+        scan_files("/");
+#endif
       }
       break;
   }
   return true;
 }
-
-

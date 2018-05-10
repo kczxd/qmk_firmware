@@ -10,7 +10,9 @@
 #include "chprintf.h"
 #include "shell.h"
 
+#if defined(HAL_USE_SDC)
 #include "fatfs/src/ff.h"
+#endif
 
 int local_fatfs_init(void);
 #define LAYOUT(k00) {{ k00 }}
