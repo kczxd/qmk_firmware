@@ -30,17 +30,19 @@ bool solenoid_enabled = false;
 bool solenoid_on = false;
 bool solenoid_buzz = false;
 bool solenoid_buzzing = false;
-uint16_t solenoid_start = 0;
+volatile uint32_t solenoid_start = 0;
 uint8_t solenoid_dwell = SOLENOID_DEFAULT_DWELL;
 
 enum planck_keycodes {
+  QWERTY = SAFE_RANGE,
   LOWER,
   RAISE,
   SOLENOID_TOG,
   SOLENOID_DWELL_MINUS,
   SOLENOID_DWELL_PLUS,
   SOLENOID_BUZZ_ON,
-  SOLENOID_BUZZ_OFF
+  SOLENOID_BUZZ_OFF,
+  EXT_PLV
 };
 
 enum planck_layers {
@@ -71,17 +73,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, SOLENOID_TOG, \
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, SOLENOID_DWELL_PLUS, \
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, RAISE, KC_TRNS, KC_TRNS, KC_TRNS, SOLENOID_DWELL_MINUS, KC_TRNS),
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, RAISE, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 
   [_ADJUST] = LAYOUT_all(
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, SOLENOID_TOG, \
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, SOLENOID_DWELL_PLUS, \
-    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, RAISE, KC_TRNS, KC_TRNS, KC_TRNS, SOLENOID_DWELL_MINUS, KC_TRNS),
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, \
+    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, RAISE, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 };
 
 const uint16_t PROGMEM fn_actions[] = {
@@ -122,7 +124,7 @@ void solenoid_fire(void) {
 
   solenoid_on = true;
   solenoid_buzzing = true;
-  solenoid_start = timer_read();
+  solenoid_start = timer_read32();
   digitalWrite(SOLENOID_PIN, PinLevelHigh);
 }
 
@@ -131,7 +133,7 @@ void solenoid_check(void) {
 
   if (!solenoid_on) return;
 
-  elapsed = timer_elapsed(solenoid_start);
+  elapsed = timer_elapsed32(solenoid_start);
 
   //Check if it's time to finish this solenoid click cycle 
   if (elapsed > solenoid_dwell) {
@@ -159,6 +161,7 @@ void solenoid_check(void) {
 
 void solenoid_setup(void) {
   pinMode(SOLENOID_PIN, PinDirectionOutput);
+  timer_init();
 }
 
 
