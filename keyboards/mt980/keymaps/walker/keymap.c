@@ -99,6 +99,37 @@ void led_set_keymap(uint8_t usb_led) {
 }
 
 bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+  uint16_t tmp_code = 0;
+
+  /* Some remappings for when number lock is off, for TKL emulation */
+  if (!numlock_on) {
+    switch (keycode) {
+      case KC_PSLS:
+        tmp_code = KC_HOME;
+        break;
+      case KC_PAST:
+        tmp_code = KC_PGUP;
+        break;
+      case KC_P7:
+        tmp_code = KC_DEL;
+        break;
+      case KC_P8:
+        tmp_code = KC_END;
+        break;
+      case KC_P9:
+        tmp_code = KC_PGDN;
+        break;
+      default:
+        break;
+    }
+    if (tmp_code) {
+      if (record->event.pressed)
+        register_code(tmp_code);
+      else
+        unregister_code(tmp_code);
+      return false;
+    }
+  }
 
   switch (keycode) {
     case KC_TRNS:
@@ -164,5 +195,6 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
     default:
       return true;
   }
+
   return true;
 }
