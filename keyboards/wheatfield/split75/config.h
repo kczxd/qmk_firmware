@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_ROWS 8
 #define MATRIX_COLS 14
 
-#define RGBLED_NUM 15
+#define RGBLED_NUM 8
 #define RGBLIGHT_ANIMATIONS
 
 #define NO_UART 1

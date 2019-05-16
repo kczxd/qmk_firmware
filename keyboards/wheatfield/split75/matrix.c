@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include "i2c.h"
 
 #include "matrix.h"
 
@@ -31,6 +32,56 @@ static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 
 void matrix_set_row_status(uint8_t row);
 uint8_t bit_reverse(uint8_t x);
+
+#define MCP23018_TWI_ADDRESS 0b0100000
+#define TW_READ		1
+#define TW_WRITE	0
+#define TWI_ADDR_WRITE ( (MCP23018_TWI_ADDRESS<<1) | TW_WRITE )
+#define TWI_ADDR_READ  ( (MCP23018_TWI_ADDRESS<<1) | TW_READ  )
+
+#define MCP_ROWS_START	8
+
+/*
+uint8_t mcp23018_init(void);
+
+uint8_t mcp23018_init(void) {
+	uint8_t ret;
+	uint8_t data[3];
+	// set pin direction
+	// - unused  : input  : 1
+	// - input   : input  : 1
+	// - driving : output : 0
+	data[0] = IODIRA;
+	data[1] = 0b00000000;  // IODIRA
+	data[2] = (0b11111111);  // IODIRB
+
+	ret = i2cMasterSendNI(TWI_ADDR_WRITE, 3, (u08 *)data);
+	if (ret) goto out;  // make sure we got an ACK
+	// set pull-up
+	// - unused  : on  : 1
+	// - input   : on  : 1
+	// - driving : off : 0
+	data[0] = GPPUA;
+	data[1] = 0b00000000;  // IODIRA
+	data[2] = (0b11111111);  // IODIRB
+
+	ret = i2cMasterSendNI(TWI_ADDR_WRITE, 3, (u08 *)data);
+	if (ret) goto out;  // make sure we got an ACK
+
+	// set logical value (doesn't matter on inputs)
+	// - unused  : hi-Z : 1
+	// - input   : hi-Z : 1
+	// - driving : hi-Z : 1
+	data[0] = OLATA;
+	data[1] = 0b11111111;  // IODIRA
+	data[2] = (0b11111111);  // IODIRB
+
+	ret = i2cMasterSendNI(TWI_ADDR_WRITE, 3, (u08 *)data);
+
+out:
+	return ret;
+}
+*/
 
 void matrix_init(void) {
     // all outputs for rows high
@@ -98,6 +149,9 @@ uint8_t matrix_scan(void) {
 void matrix_set_row_status(uint8_t row) {
     DDRB = (1 << row);
     PORTB = ~(1 << row);
+
+    //Set the row on the slave half
+      
 }
 
 uint8_t bit_reverse(uint8_t x) {
