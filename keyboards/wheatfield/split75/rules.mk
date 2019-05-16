@@ -48,4 +48,4 @@ CUSTOM_MATRIX = yes
 SRC = matrix.c i2c.c
 
 # programming options
-PROGRAM_CMD = ./keyboards/ps2avrGB/program $(TARGET).hex
+PROGRAM_CMD = ./keyboards/wheatfield/split75/program $(TARGET).hex
