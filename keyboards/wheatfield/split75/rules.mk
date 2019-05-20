@@ -45,7 +45,7 @@ OPT_DEFS = -DDEBUG_LEVEL=0
 
 # custom matrix setup
 CUSTOM_MATRIX = yes
-SRC = matrix.c i2c.c
+SRC = matrix.c i2c_master.c
 
 # programming options
-PROGRAM_CMD = ./keyboards/wheatfield/split75/program $(TARGET).hex
+PROGRAM_CMD = ./keyboards/wheatfield/split75/program .build/$(TARGET).hex

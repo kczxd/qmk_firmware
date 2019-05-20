@@ -19,10 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "rgblight.h"
 
 #include <avr/pgmspace.h>
+#include <i2c_master.h>
 
 #include "action_layer.h"
-#include "i2c.h"
 #include "quantum.h"
+
+#define I2C_TIMEOUT     10
 
 // for keyboard subdirectory level init functions
 // @Override
@@ -45,7 +47,7 @@ void rgblight_set(void) {
   }
 
   i2c_init();
-  i2c_send(0xb0, (uint8_t*)led, 3 * RGBLED_NUM);
+  i2c_transmit(0xb0, (uint8_t*)led, 3 * RGBLED_NUM, I2C_TIMEOUT);
 }
 
 bool rgb_init = false;
@@ -54,7 +56,7 @@ void matrix_scan_kb(void) {
   // if LEDs were previously on before poweroff, turn them back on
   if (rgb_init == false && rgblight_config.enable) {
     i2c_init();
-    i2c_send(0xb0, (uint8_t*)led, 3 * RGBLED_NUM);
+    i2c_transmit(0xb0, (uint8_t*)led, 3 * RGBLED_NUM, I2C_TIMEOUT);
     rgb_init = true;
   }
 
@@ -75,4 +77,12 @@ void matrix_init_user(void) {
 __attribute__((weak)) // overridable
 void matrix_scan_user(void) {
 
+}
+
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  debug_matrix=true;
+  //debug_keyboard=true;
+  //debug_mouse=true;
 }

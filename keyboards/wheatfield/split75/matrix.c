@@ -17,7 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <avr/io.h>
 #include <util/delay.h>
-#include "i2c.h"
+#include <i2c_master.h>
+#include <debug.h>
 
 #include "matrix.h"
 
@@ -33,15 +34,29 @@ static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 void matrix_set_row_status(uint8_t row);
 uint8_t bit_reverse(uint8_t x);
 
+/* If no key events have occurred, the scanners will time out on reads.
+ * So we don't want to be too permissive here. */
+#define I2C_TIMEOUT     10
+
 #define MCP23018_TWI_ADDRESS 0b0100000
 #define TW_READ		1
 #define TW_WRITE	0
 #define TWI_ADDR_WRITE ( (MCP23018_TWI_ADDRESS<<1) | TW_WRITE )
 #define TWI_ADDR_READ  ( (MCP23018_TWI_ADDRESS<<1) | TW_READ  )
-
+#define IODIRA 0x00  // i/o direction register
+#define IODIRB 0x01
+// register addresses (see "mcp23018.md")
+#define IODIRA 0x00  // i/o direction register
+#define IODIRB 0x01
+#define GPPUA  0x0C  // GPIO pull-up resistor register
+#define GPPUB  0x0D
+#define GPIOA  0x12  // general purpose i/o port register (write modifies OLAT)
+#define GPIOB  0x13
+#define OLATA  0x14  // output latch register
+#define OLATB  0x15
 #define MCP_ROWS_START	8
 
-/*
+
 uint8_t mcp23018_init(void);
 
 uint8_t mcp23018_init(void) {
@@ -55,7 +70,7 @@ uint8_t mcp23018_init(void) {
 	data[1] = 0b00000000;  // IODIRA
 	data[2] = (0b11111111);  // IODIRB
 
-	ret = i2cMasterSendNI(TWI_ADDR_WRITE, 3, (u08 *)data);
+	ret = i2c_transmit(TWI_ADDR_WRITE, (uint8_t *)data, 3, I2C_TIMEOUT);
 	if (ret) goto out;  // make sure we got an ACK
 	// set pull-up
 	// - unused  : on  : 1
@@ -65,7 +80,7 @@ uint8_t mcp23018_init(void) {
 	data[1] = 0b00000000;  // IODIRA
 	data[2] = (0b11111111);  // IODIRB
 
-	ret = i2cMasterSendNI(TWI_ADDR_WRITE, 3, (u08 *)data);
+	ret = i2c_transmit(TWI_ADDR_WRITE, (uint8_t *)data, 3, I2C_TIMEOUT);
 	if (ret) goto out;  // make sure we got an ACK
 
 	// set logical value (doesn't matter on inputs)
@@ -76,12 +91,12 @@ uint8_t mcp23018_init(void) {
 	data[1] = 0b11111111;  // IODIRA
 	data[2] = (0b11111111);  // IODIRB
 
-	ret = i2cMasterSendNI(TWI_ADDR_WRITE, 3, (u08 *)data);
+	ret = i2c_transmit(TWI_ADDR_WRITE, (uint8_t *)data, 3, I2C_TIMEOUT);
 
 out:
 	return ret;
 }
-*/
+
 
 void matrix_init(void) {
     // all outputs for rows high
@@ -104,26 +119,41 @@ void matrix_init(void) {
         matrix_debouncing[row] = 0x00;
     }
 
+    // Initialize the chip on the other half
+    mcp23018_init();
+
     // Initialize the other half of the keyboard 
     matrix_init_quantum();
 }
 
 uint8_t matrix_scan(void) {
+    uint8_t txdata[3];
+    uint8_t data;
+
+    debug_enable = 1;
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+        //Set the local row high
         matrix_set_row_status(row);
+	//Set the remote row high
+	txdata[0] = (GPIOB);
+	txdata[1] = ( 0xFF & ~(1<<row) );
+	i2c_transmit(TWI_ADDR_WRITE, (uint8_t *)txdata, 2, I2C_TIMEOUT);
+
         _delay_us(5);
+
+	data = 0;
+	i2c_receive(TWI_ADDR_READ, &data, 1, I2C_TIMEOUT);
 
         matrix_row_t cols = (
             // cols 0..7, PORTA 0 -> 7
             (~PINA) & 0xFF
         ) | (
-            // cols 8..13, PORTC 7 -> 0
-            bit_reverse((~PINC) & 0xFF) << 8
-        ) | (
-            // col 14, PORTD 7
-            ((~PIND) & (1 << PIND7)) << 7
+            // cols 8..13
+            bit_reverse(~data)
         );
 
+	dprintf("MIKE: 0x%x\n", (int)cols);
+	print("OMG\n");
         if (matrix_debouncing[row] != cols) {
             matrix_debouncing[row] = cols;
             debouncing = DEBOUNCE;
