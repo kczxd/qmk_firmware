@@ -19,12 +19,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <util/delay.h>
 #include <i2c_master.h>
 #include <debug.h>
-
 #include "matrix.h"
+
+#include "pincontrol.h"
 
 #ifndef DEBOUNCE
 #   define DEBOUNCE	5
 #endif
+
+static void dled_init(void) {
+	pinMode(B5, PinDirectionOutput);	
+	pinMode(B6, PinDirectionOutput);	
+	pinMode(B7, PinDirectionOutput);	
+}
+
+static uint8_t dled = 0;
+
+static void dled_update(void) {
+	(dled & 0x1) ? digitalWrite(B5, PinLevelHigh) : digitalWrite(B5, PinLevelLow);
+	((dled >> 1) & 0x1) ? digitalWrite(B5, PinLevelHigh) : digitalWrite(B6, PinLevelLow);
+	((dled >> 2) & 0x1) ? digitalWrite(B5, PinLevelHigh) : digitalWrite(B7, PinLevelLow);
+
+}
 
 static uint8_t debouncing = DEBOUNCE;
 
@@ -122,6 +138,9 @@ void matrix_init(void) {
     // Initialize the chip on the other half
     mcp23018_init();
 
+    // Debug LED init
+    dled_init();
+
     // Initialize the other half of the keyboard 
     matrix_init_quantum();
 }
@@ -131,6 +150,8 @@ uint8_t matrix_scan(void) {
     uint8_t data;
 
     debug_enable = 1;
+    dled_update();
+
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         //Set the local row high
         matrix_set_row_status(row);
