@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define I2C_TIMEOUT     10
 
-//#define LED_INDICATORS
+#define LED_INDICATORS
 
 uint8_t led0 = 0, led1 = 0, led2 = 0;
 

@@ -22,6 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "split75.h"
 #include "pincontrol.h"
 
+#include <string.h>
+#include <stdio.h>
+
 #ifndef DEBOUNCE
 #   define DEBOUNCE    5
 #endif
@@ -30,7 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 extern uint8_t led0, led1, led2;
 
+#if defined(DEBOUNCE)
 static uint8_t debouncing = DEBOUNCE;
+#endif
 
 static matrix_row_t matrix[MATRIX_ROWS];
 static matrix_row_t matrix_debouncing[MATRIX_ROWS];
@@ -141,25 +146,33 @@ void matrix_init(void) {
 }
 
 uint8_t matrix_scan(void) {
+#if defined(RIGHT_HALF)
     uint8_t data;
+#endif
+    matrix_row_t cols;
 
     indicator_update();
-
+    
+    
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+        cols = 0;
 	// Select the row to scan
         matrix_set_row_status(row);
 
         _delay_us(5);
 	//Set the local row
 
-        data = 0;
-
 #if defined(RIGHT_HALF)
+        data = 0;
         i2c_receive(TWI_ADDR_WRITE, &data, 1, I2C_TIMEOUT);
 #endif
 
-        matrix_row_t cols = ( (~PINA) & 0xFF ) | (((~data) & 0xFF) << 7);
+        cols |= ((~(PINA | 0x80)) & 0x7F);
+#if defined(RIGHT_HALF)
+	cols |= (((~data) & 0x7F) << 7);
+#endif
 
+#if defined(DEBOUNCE)
         if (matrix_debouncing[row] != cols) {
             matrix_debouncing[row] = cols;
             debouncing = DEBOUNCE;
@@ -175,6 +188,10 @@ uint8_t matrix_scan(void) {
             }
         }
     }
+#else
+        matrix[row] = cols;
+    }
+#endif
 
     matrix_scan_quantum();
 
