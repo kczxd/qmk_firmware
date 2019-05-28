@@ -27,21 +27,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define LED_INDICATORS
 
+// Use the backlight as caps lock indicator?
+// Best used if you only solder an LED under caps lock
+#define BL_AS_CAPSLOCK 
+
 uint8_t led0 = 0, led1 = 0, led2 = 0;
 
 void indicator_init(void) {
-    // D0, D1, and D6 are the indicators
+    // D0, D1, and D6 are the indicators and D4 is the backlight
     DDRD |= 0x53;
     PORTD |= 0x53;
-}
-
-void indicator_update(void) {
-    if (led0) writePinHigh(D0);
-    else writePinLow(D0);
-    if (led1) writePinHigh(D1);
-    else writePinLow(D1);
-    if (led2) writePinHigh(D6);
-    else writePinLow(D6);
 }
 
 // for keyboard subdirectory level init functions
@@ -105,26 +100,30 @@ void keyboard_post_init_user(void) {
 void led_set_user(uint8_t usb_led) {
 
   if (IS_LED_ON(usb_led, USB_LED_NUM_LOCK)) {
-    led0 = 1;
+    writePinHigh(D0);
   }
   else {
-    led0 = 0;
+    writePinLow(D0);
   }
 
   if (IS_LED_ON(usb_led, USB_LED_CAPS_LOCK)) {
-    led1 = 1;
+    writePinHigh(D1);
+#if defined(BL_AS_CAPSLOCK)
     writePinHigh(D4);
+#endif
   }
   else {
-    led1 = 0;
+    writePinLow(D1);
+#if defined(BL_AS_CAPSLOCK)
     writePinLow(D4);
+#endif
   }
 
   if (IS_LED_ON(usb_led, USB_LED_SCROLL_LOCK)) {
-    led2 = 1;
+    writePinHigh(D6);
   }
   else {
-    led2 = 0;
+    writePinLow(D6);
   }
 }
 #endif

@@ -42,5 +42,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SCROLLOCK led2
 
 void indicator_init(void);
-void indicator_update(void);
-

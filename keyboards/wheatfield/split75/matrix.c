@@ -151,8 +151,6 @@ uint8_t matrix_scan(void) {
 #endif
     matrix_row_t cols;
 
-    indicator_update();
-   
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         cols = 0;
 	// Select the row to scan
