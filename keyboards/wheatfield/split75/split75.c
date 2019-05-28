@@ -31,8 +31,8 @@ uint8_t led0 = 0, led1 = 0, led2 = 0;
 
 void indicator_init(void) {
     // D0, D1, and D6 are the indicators
-    DDRD |= 0x43;
-    PORTD |= 0x43;
+    DDRD |= 0x53;
+    PORTD |= 0x53;
 }
 
 void indicator_update(void) {
@@ -113,9 +113,11 @@ void led_set_user(uint8_t usb_led) {
 
   if (IS_LED_ON(usb_led, USB_LED_CAPS_LOCK)) {
     led1 = 1;
+    writePinHigh(D4);
   }
   else {
     led1 = 0;
+    writePinLow(D4);
   }
 
   if (IS_LED_ON(usb_led, USB_LED_SCROLL_LOCK)) {
