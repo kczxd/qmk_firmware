@@ -6,7 +6,8 @@
 #include "wait.h"
 #include "print.h"
 #include "matrix.h"
-
+#include "action.h"
+#include "mikebench.h"
 
 /*
  * Matt3o's WhiteFox
@@ -22,18 +23,124 @@ static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 static bool debouncing = false;
 static uint16_t debouncing_time = 0;
 
-void mike_init(void)
+#define SOLENOID_DEFAULT_DWELL 12 
+#define SOLENOID_MAX_DWELL 100
+#define SOLENOID_MIN_DWELL 4
+#define SOLENOID_MAX 4
+#define SOLENOID_COUNT 3
+
+static bool solenoid_enabled[SOLENOID_MAX] = {true, true, true};
+static bool solenoid_is_on[SOLENOID_MAX] = {false, false, false};
+static bool solenoid_buzz[SOLENOID_MAX] = {false, false, false}; 
+static bool solenoid_buzzing[SOLENOID_MAX] = {false, false, false};
+volatile static uint32_t solenoid_start_time[SOLENOID_MAX] = {0, 0, 0};
+static uint8_t solenoid_dwell[SOLENOID_MAX] = {SOLENOID_DEFAULT_DWELL, SOLENOID_DEFAULT_DWELL, SOLENOID_DEFAULT_DWELL};
+static uint8_t solenoid_index = 0;
+
+void solenoid_buzz_on(void) {
+  for(int i=0;i<SOLENOID_COUNT;i++)
+    solenoid_buzz[i] = true;
+}
+
+void solenoid_buzz_off(void) {
+  for(int i=0;i<SOLENOID_COUNT;i++)
+    solenoid_buzz[i] = false;
+}
+
+void solenoid_dwell_minus(void) {
+  for(int i=0;i<SOLENOID_COUNT;i++)
+    if (solenoid_dwell[i] > 0) solenoid_dwell[i]--;
+}
+
+void solenoid_dwell_plus(void) {
+  for(int i=0;i<SOLENOID_COUNT;i++)
+    if (solenoid_dwell[i] < SOLENOID_MAX_DWELL) solenoid_dwell[i]++;
+}
+
+void solenoid_toggle(void) {
+  for(int i=0;i<SOLENOID_COUNT;i++)
+    solenoid_enabled[i] = !solenoid_enabled[i];
+}
+
+void solenoid_off(int i) {
+  switch (i) {
+    case 0: palClearPad(GPIOB, 0); break;
+    case 1: palClearPad(GPIOB, 1); break;
+    case 2: palClearPad(GPIOD, 2); break;
+    case 3: palClearPad(GPIOD, 3); break;
+  }
+}
+ 
+void solenoid_on(int i) {
+  switch (i) {
+    case 0: palSetPad(GPIOB, 0); break;
+    case 1: palSetPad(GPIOB, 1); break;
+    case 2: palSetPad(GPIOD, 2); break;
+    case 3: palSetPad(GPIOD, 3); break;
+  }
+}
+
+void solenoid_stop(int i) {
+  solenoid_off(i);
+  solenoid_is_on[i] = false;
+  solenoid_buzzing[i] = false;
+}
+
+void solenoid_start(int i) {
+  solenoid_is_on[i] = true;
+  solenoid_buzzing[i] = true;
+  solenoid_start_time[i] = timer_read32();
+  solenoid_on(i);
+}
+
+void solenoid_fire(void) {
+  if (!solenoid_enabled[solenoid_index]) return;
+  if (!solenoid_buzz[solenoid_index] && solenoid_is_on[solenoid_index]) return;
+  if (solenoid_buzz[solenoid_index] && solenoid_buzzing[solenoid_index]) return;
+  solenoid_start(solenoid_index);
+  solenoid_index = ((solenoid_index + 1) % SOLENOID_COUNT);
+}
+
+void solenoid_check(void) {
+  uint16_t elapsed = 0;
+
+  for (int i=0; i<SOLENOID_COUNT; i++) {
+    if (!solenoid_is_on[i]) continue;
+
+    elapsed = timer_elapsed32(solenoid_start_time[i]);
+
+    //Check if it's time to finish this solenoid click cycle 
+    if (elapsed > solenoid_dwell[i]) {
+      solenoid_stop(i);
+      return;
+    }
+
+    //Check whether to buzz the solenoid on and off
+    if (solenoid_buzz[i]) {
+      if (elapsed / SOLENOID_MIN_DWELL % 2 == 0){
+        if (!solenoid_buzzing[i]) {
+          solenoid_buzzing[i] = true;
+          solenoid_on(i); 
+        }
+      }
+      else {
+        if (solenoid_buzzing[i]) {
+          solenoid_buzzing[i] = false;
+          solenoid_off(i);
+        }
+      }
+    }
+  }
+}
+
+void solenoid_init(void)
 {
-    palSetPadMode(GPIOC, 4,  PAL_MODE_OUTPUT_PUSHPULL);
-    palSetPadMode(GPIOC, 5,  PAL_MODE_OUTPUT_PUSHPULL);
-    palSetPadMode(GPIOC, 6,  PAL_MODE_OUTPUT_PUSHPULL);
-    palSetPadMode(GPIOC, 7,  PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPadMode(GPIOB, 0,  PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPadMode(GPIOB, 1,  PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPadMode(GPIOD, 2,  PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPadMode(GPIOD, 3,  PAL_MODE_OUTPUT_PUSHPULL);
 
-
-    palSetPad(GPIOC, 4);
-    palClearPad(GPIOC, 5);
-    palSetPad(GPIOC, 6);
-    palClearPad(GPIOC, 7);
+    timer_init();
 }
 
 void matrix_init(void)
@@ -63,7 +170,7 @@ void matrix_init(void)
     memset(matrix, 0, MATRIX_ROWS * sizeof(matrix_row_t));
     memset(matrix_debouncing, 0, MATRIX_ROWS * sizeof(matrix_row_t));
 
-    mike_init();
+    solenoid_init();
 
     matrix_init_quantum();
 }
@@ -120,6 +227,7 @@ uint8_t matrix_scan(void)
         debouncing = false;
     }
     matrix_scan_quantum();
+    solenoid_check();
     return 1;
 }
 
@@ -148,3 +256,12 @@ void matrix_print(void)
         xprintf("\n");
     }
 }
+
+bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
+  if (record->event.pressed) {
+    solenoid_fire();
+  }
+
+  return process_record_user(keycode, record);
+}
+

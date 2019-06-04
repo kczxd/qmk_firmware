@@ -45,3 +45,10 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRNS,KC_TRNS,KC_TRNS,               KC_TRNS,          KC_TRNS,KC_TRNS,KC_TRNS,     KC_HOME,KC_PGDN,KC_END  \
     ),
 };
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+  }
+  return true;
+}
+
