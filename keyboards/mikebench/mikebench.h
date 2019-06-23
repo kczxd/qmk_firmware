@@ -103,3 +103,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 #endif
+
+void solenoid_buzz_on(void);
+
+void solenoid_buzz_off(void);
+
+void solenoid_dwell_minus(void);
+
+void solenoid_dwell_plus(void);
+
+void solenoid_toggle(void);
+
+

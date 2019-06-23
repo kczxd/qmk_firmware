@@ -29,7 +29,7 @@ static uint16_t debouncing_time = 0;
 #define SOLENOID_MAX 4
 #define SOLENOID_COUNT 3
 
-static bool solenoid_enabled[SOLENOID_MAX] = {true, true, true};
+static bool solenoid_enabled[SOLENOID_MAX] = {false, false, false};
 static bool solenoid_is_on[SOLENOID_MAX] = {false, false, false};
 static bool solenoid_buzz[SOLENOID_MAX] = {false, false, false}; 
 static bool solenoid_buzzing[SOLENOID_MAX] = {false, false, false};
@@ -73,6 +73,7 @@ void solenoid_off(int i) {
  
 void solenoid_on(int i) {
   switch (i) {
+    if (!solenoid_enabled[i]) return;
     case 0: palSetPad(GPIOB, 0); break;
     case 1: palSetPad(GPIOB, 1); break;
     case 2: palSetPad(GPIOD, 2); break;

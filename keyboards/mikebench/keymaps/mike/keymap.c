@@ -15,6 +15,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include QMK_KEYBOARD_H
+#include "mikebench.h"
+
+enum planck_keycodes {
+  QWERTY = SAFE_RANGE,
+  SOLENOID_TOG,
+  SOLENOID_DWELL_MINUS,
+  SOLENOID_DWELL_PLUS,
+  SOLENOID_BUZZ_ON,
+  SOLENOID_BUZZ_OFF
+};
 
 typedef struct {
   bool is_press_action;
@@ -63,9 +73,9 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [1] = LAYOUT( \
         KC_TRNS, KC_F1,   KC_F2,   KC_F3,   KC_F4,  KC_F5,  KC_F6,  KC_F7,  KC_F8,  KC_F9,   KC_F10,  KC_F11,   KC_F12,  KC_TRNS,  KC_DEL,KC_PSCR,\
         KC_TRNS, KC_TRNS,   KC_UP,   KC_TRNS,   RGB_TOG,RGB_VAI,RGB_HUI,RGB_SAI,KC_INS, RESET,   KC_PSCR, KC_SLCK,  KC_PAUS, KC_BSLS,  KC_SLCK,   \
-        KC_TRNS, KC_LEFT, KC_DOWN, KC_RIGHT,RGB_MOD,RGB_VAD,RGB_HUD,RGB_SAD,KC_TRNS,  KC_TRNS,   KC_F14,  KC_F15,   KC_TRNS, KC_INS,   KC_HOME,   \
-        KC_LSFT, KC_TRNS, KC_MPRV, KC_MPLY, KC_MNXT,KC_TRNS,  BL_TOGG,KC_TRNS,  KC_MUTE,KC_VOLD, KC_VOLU, KC_TRNS,    KC_RSFT, RGB_MOD,  KC_END,    \
-        KC_LCTL, KC_LGUI, TD(ALT_OSL1),        RESET,            KC_TRNS,KC_RCTL, KC_TRNS,  KC_HOME,BL_STEP,KC_END \
+        KC_TRNS, KC_LEFT, KC_DOWN, KC_RIGHT,RGB_MOD,RGB_VAD,RGB_HUD,RGB_SAD,KC_TRNS,  KC_TRNS,   KC_F14,  KC_F15,   KC_TRNS, SOLENOID_TOG, KC_HOME,   \
+        KC_LSFT, KC_TRNS, KC_MPRV, KC_MPLY, KC_MNXT,KC_TRNS,  BL_TOGG,KC_TRNS,  KC_MUTE,KC_VOLD, KC_VOLU, KC_TRNS,    KC_RSFT, SOLENOID_DWELL_PLUS,  KC_END,    \
+        KC_LCTL, KC_LGUI, TD(ALT_OSL1),        RESET,            KC_TRNS,KC_RCTL, KC_TRNS,  SOLENOID_BUZZ_OFF,SOLENOID_DWELL_MINUS,SOLENOID_BUZZ_ON \
     ),
 };
 
@@ -117,7 +127,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [ALT_OSL1]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset)
 };
 
-bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
   switch (keycode) {
     case KC_TRNS:
@@ -133,6 +143,31 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
         return false;
       }
       return true;
+    case SOLENOID_TOG:
+      if (record->event.pressed) {
+        solenoid_toggle();
+      }
+      break;
+    case SOLENOID_DWELL_MINUS:
+      if (record->event.pressed) {
+        solenoid_dwell_minus();
+      }
+      break;
+    case SOLENOID_DWELL_PLUS:
+      if (record->event.pressed) {
+        solenoid_dwell_plus();
+      }
+      break;
+    case SOLENOID_BUZZ_ON:
+      if (record->event.pressed) {
+        solenoid_buzz_on();
+      }
+      break;
+    case SOLENOID_BUZZ_OFF:
+      if (record->event.pressed) {
+        solenoid_buzz_off();
+      }
+      break;
     default:
       return true;
   }
