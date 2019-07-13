@@ -27,7 +27,7 @@ static uint16_t debouncing_time = 0;
 #define SOLENOID_MAX_DWELL 100
 #define SOLENOID_MIN_DWELL 4
 #define SOLENOID_MAX 4
-#define SOLENOID_COUNT 3
+#define SOLENOID_COUNT 1
 
 static bool solenoid_enabled[SOLENOID_MAX] = {false, false, false};
 static bool solenoid_is_on[SOLENOID_MAX] = {false, false, false};
@@ -63,6 +63,7 @@ void solenoid_toggle(void) {
 }
 
 void solenoid_off(int i) {
+  if (!solenoid_enabled[i]) return;
   switch (i) {
     case 0: palClearPad(GPIOB, 0); break;
     case 1: palClearPad(GPIOB, 1); break;
@@ -72,8 +73,8 @@ void solenoid_off(int i) {
 }
  
 void solenoid_on(int i) {
+  if (!solenoid_enabled[i]) return;
   switch (i) {
-    if (!solenoid_enabled[i]) return;
     case 0: palSetPad(GPIOB, 0); break;
     case 1: palSetPad(GPIOB, 1); break;
     case 2: palSetPad(GPIOD, 2); break;
