@@ -21,3 +21,7 @@
 #define ONESHOT_TAP_TOGGLE 5
 #define ONESHOT_TIMEOUT 5000
 
+#if defined(RGBLED_NUM)
+#undef RGBLED_NUM
+#endif
+#define RGBLED_NUM 6
