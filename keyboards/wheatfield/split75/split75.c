@@ -94,6 +94,7 @@ void keyboard_post_init_user(void) {
   // Customise these values to desired behaviour
   //debug_keyboard=true;
   //debug_mouse=true;
+  led_set_user();
 }
 
 #if defined(LED_INDICATORS)
