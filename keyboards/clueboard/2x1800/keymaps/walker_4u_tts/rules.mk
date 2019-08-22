@@ -69,5 +69,6 @@ ARDUINO_DIR = $(USB_HID_DIR)/arduino-1.0.1
 VPATH += $(TMK_DIR)/$(ARDUINO_DIR)/variants/leonardo
 SRC += TTSWrapper.c 
 SRC += TTS/TTS.cpp
+SRC += TTS/sound.cpp
 SRC += TTS/analog.c
 
