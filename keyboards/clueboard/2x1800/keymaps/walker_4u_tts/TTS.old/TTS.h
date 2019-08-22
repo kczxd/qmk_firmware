@@ -13,12 +13,12 @@
 
 #ifndef _TTS_H_
 #define _TTS_H_
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include "progmem.h"
 
-#define boolean bool
 typedef uint8_t byte;
 
 class TTS {

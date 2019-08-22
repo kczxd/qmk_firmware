@@ -12,14 +12,15 @@
  * Modified for Timer5 on Arduino Mega2560 by Peter Dambrowsky.
  */
 
+
 #include "TTS.h"
 #include "english.h"
-#include "sound.h"
 #if defined(__AVR__)
   #include <avr/io.h>
 #endif
 #include "pincontrol.h"
 
+#define TIME_FACTOR ((F_CPU+250000)/500000)
 
 #define NUM_VOCAB sizeof(s_vocab)/sizeof(VOCAB)
 #define NUM_PHONEME sizeof(s_phonemes)/sizeof(PHONEME)
@@ -80,19 +81,20 @@ static int textToPhonemes(const char *src, const VOCAB * vocab, char *dest)
 {
     int outIndex = 0;		// Current offset into dest
     int inIndex = -1;		// Starts at -1 so that a leading space is assumed
+    bool endsInWhiteSpace = false;
 
     while (inIndex == -1 || src[inIndex]) {	// until end of text
 	int maxMatch = 0;	// Max chars matched on input text
 	int numOut = 0;		// Number of characters copied to output stream for the best match
-	boolean endsInWhiteSpace = false;
 	int maxWildcardPos = 0;
+	endsInWhiteSpace = false;
 
 	// Get next phoneme, P2
 	for (unsigned int ph = 0; ph < NUM_VOCAB; ph++) {
 	    int y, x;
 	    char wildcard = 0;	// modifier
 	    int wildcardInPos = 0;
-	    boolean hasWhiteSpace = false;
+	    bool hasWhiteSpace = false;
 	    const void *text = pgm_read_ptr(&vocab[ph].txt);
 	    const void *phon = pgm_read_ptr(&vocab[ph].phoneme);
 
@@ -195,7 +197,7 @@ static int phonemesToData(const char *textp, const PHONEME * phoneme)
 
     while (*textp) {
 	// P20: Get next phoneme
-	boolean anyMatch = false;
+	bool anyMatch = false;
 	int longestMatch = 0;
 	int numOut = 0;		// The number of bytes copied to the output for the longest match
 
@@ -330,6 +332,151 @@ static byte random2(void)
     return seed0;
 }
 
+static void soundOff(int pin)
+{
+    switch (pin) {
+    case B5:
+        TCCR1A &= ~(_BV(COM1A1));
+        break;
+    case B6:
+        TCCR1A &= ~(_BV(COM1B1)); 
+        break;
+    case B7:
+        TCCR1A &= ~(_BV(COM1C1));
+        break;
+    case C4:
+        TCCR3A &= ~(_BV(COM3C1)); 
+        break;
+    case C5:
+        TCCR3A &= ~(_BV(COM3B1));
+        break;
+    case C6:
+        TCCR3A &= ~(_BV(COM3A1));
+        break;
+    }
+}
+
+#define PWM_TOP (1200/2)
+
+//https://sites.google.com/site/qeewiki/books/avr-guide/pwm-on-the-atmega328
+static void soundOn(int pin)
+{
+    switch (pin) {
+    case B7:
+        TCCR1A = 0;         // disable PWM
+        ICR1 = PWM_TOP;
+        // Set the Timer1 to use for PWM sound control
+        TCCR1B = _BV(WGM13) | _BV(CS10);
+        TCNT1 = 0;
+        TCCR1A |= _BV(COM1C1); 
+        break;
+    case B6:
+        DDRC |= _BV(PORTC6);
+        TCCR1A = 0;         // disable PWM
+        ICR1 = PWM_TOP;
+        // Set the Timer1 to use for PWM sound control
+        TCCR1B = _BV(WGM13) | _BV(CS10);
+        TCNT1 = 0;
+        TCCR1A |= _BV(COM1B1);  // ENABLE PWM ON B2 USING OC1B, OCR1B
+        break;
+    case B5:
+        TCCR1A = 0;         // disable PWM
+        ICR1 = PWM_TOP;
+        TCCR1B = _BV(WGM13) | _BV(CS10);
+        TCNT1 = 0;
+        TCCR1A |= _BV(COM1A1);
+        break;
+    case C4:
+        TCCR3A = 0;         // disable PWM
+        ICR3 = PWM_TOP;
+        TCCR3B = _BV(WGM33) | _BV(CS30);
+        TCNT3 = 0;
+        TCCR3A |= _BV(COM3C1);
+        break;
+    case C5:
+        TCCR3A = 0;         // disable PWM
+        ICR3 = PWM_TOP;
+        TCCR3B = _BV(WGM33) | _BV(CS30);
+        TCNT3 = 0;
+        TCCR3A |= _BV(COM3B1);
+        break;
+    case C6:
+        TCCR3A = 0;         // disable PWM
+        ICR3 = PWM_TOP;
+        TCCR3B = _BV(WGM33) | _BV(CS30);
+        TCNT3 = 0;
+        TCCR3A |= _BV(COM3A1);
+        break;
+    }
+
+    // initialise random number seed
+    seed0 = 0xecu;
+    seed1 = 7;
+    seed2 = 0xcfu;
+}
+
+// Logarithmic scale
+//static const int16_t PROGMEM Volume[8] =
+    //{ 0, PWM_TOP * 0.01, PWM_TOP * 0.02, PWM_TOP * 0.03, PWM_TOP * 0.06,
+//PWM_TOP * 0.12, PWM_TOP * 0.25, PWM_TOP * 0.5 };
+
+// Linear scale
+static const uint16_t PROGMEM Volume[8] =
+    { 0, (uint16_t)(PWM_TOP * 0.07), (uint16_t)(PWM_TOP * 0.14), (uint16_t)(PWM_TOP * 0.21), (uint16_t)(PWM_TOP * 0.29),
+    (uint16_t)(PWM_TOP * 0.36), (uint16_t)(PWM_TOP * 0.43), (uint16_t)(PWM_TOP * 0.5)
+};
+
+static void sound(int pin, byte b)
+{
+    // Update PWM volume
+    b = (b & 15);
+
+#ifdef __AVR__
+    uint16_t duty = pgm_read_word(&Volume[b >> 1]); // get duty cycle
+#endif
+
+    switch (pin) {
+    case B7:
+        if (duty != OCR1C) {
+            TCNT1 = 0;
+            OCR1C = duty;
+        }
+        break;
+    case B6:
+        if (duty != OCR1B) {
+            TCNT1 = 0;
+            OCR1B = duty;
+        }
+        break;
+    case B5:
+        if (duty != OCR1A) {
+            TCNT1 = 0;
+            OCR1A = duty;
+        }
+        break;
+    case C4:
+        if (duty != OCR3C) {
+            TCNT3 = 0;
+            OCR3C = duty;
+        }
+        break;
+    case C5:
+        if (duty != OCR3B) {
+            TCNT3 = 0;
+            OCR3B = duty;
+        }
+        break;
+    case C6:
+        if (duty != OCR3A) {
+            TCNT3 = 0;
+            OCR3A = duty;
+        }
+        break;
+    default:
+        analogWriteMike(pin, b*8);
+    }
+}
+
 static byte playTone(int pin, byte soundNum, byte soundPos, char pitch1, char pitch2, byte count, byte volume)
 {
     const byte *soundData = &SoundData[soundNum * 0x40];
@@ -385,11 +532,6 @@ void TTS::sayPhonemes(const char *textp)
     if (phonemesToData(textp, s_phonemes)) {
 	// phonemes has list of sound bytes
 	soundOn(pin);
-
-	// initialise random number seed
-	seed0 = 0xecu;
-	seed1 = 7;
-	seed2 = 0xcfu;
 
 	// _630C
 	byte1 = 0;

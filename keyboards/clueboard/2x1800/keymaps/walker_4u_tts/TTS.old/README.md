@@ -1,5 +1,3 @@
-View this project on [CADLAB.io](https://cadlab.io/project/1281). 
-
 # TTS
 
 ## Text-to-Speech for Arduino
@@ -17,8 +15,6 @@ View this project on [CADLAB.io](https://cadlab.io/project/1281).
 - Teensy 3.2: pin A14
 - Teensy 3.5, 3.6: pins A21, A22
 - Teensy LC: pin A12
-- ESP8266: pins 0 to 16 (with analogWrite())
-- ESP32: DAC1 or DAC2 (pins 25 or 26)
 
 ## Amplifier
 
