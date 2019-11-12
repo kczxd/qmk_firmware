@@ -27,6 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PRODUCT         THINK6.5
 #define DESCRIPTION     65% 6.5 degree custom keyboard
 
+#define TAPPING_TERM 200
+#define ONESHOT_TAP_TOGGLE 5
+#define ONESHOT_TIMEOUT 5000
+
 /* key matrix size */
 #define MATRIX_ROWS 5
 #define MATRIX_COLS 16
