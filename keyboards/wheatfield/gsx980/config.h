@@ -34,7 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RGBLED_NUM 1
 #define RGBLIGHT_ANIMATIONS
-#define RGB_DI_PIN D5
 
 #define NO_UART 1
 #define BOOTLOADHID_BOOTLOADER 1
