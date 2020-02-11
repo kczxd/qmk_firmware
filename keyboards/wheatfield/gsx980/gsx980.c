@@ -30,12 +30,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Best used if you only solder an LED under caps lock
 #define BL_AS_CAPSLOCK 
 
+__attribute__ ((weak))
+void matrix_init_keymap(void) {}
+
+__attribute__ ((weak))
+void matrix_scan_keymap(void) {}
+
+__attribute__ ((weak))
+bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+  return true;
+}
+__attribute__ ((weak))
+uint32_t layer_state_set_keymap (uint32_t state) {
+  return state;
+}
+__attribute__ ((weak))
+void led_set_keymap(uint8_t usb_led) {}
+
+void matrix_init_user(void) {
+  matrix_init_keymap();
+}
+
+void matrix_scan_user(void) {
+  matrix_scan_keymap();
+}
+
 uint8_t led0 = 0, led1 = 0, led2 = 0;
 
 void indicator_init(void) {
     // D0, D1, and D6 are the indicators and D4 is the backlight
     DDRD |= 0x53;
     PORTD |= 0x53;
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  return process_record_keymap(keycode, record);
 }
 
 #if defined(LED_INDICATORS)
@@ -67,5 +96,6 @@ void led_set_user(uint8_t usb_led) {
   else {
     writePinLow(D6);
   }
+  led_set_keymap(usb_led);
 }
 #endif
