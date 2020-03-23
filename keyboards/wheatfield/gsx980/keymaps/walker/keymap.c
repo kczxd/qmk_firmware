@@ -1,6 +1,11 @@
 #include "gsx980.h"
 
 bool numlock_on = true;
+bool winkey_enable = true;
+
+enum planck_keycodes {                      
+	WINLOCK = SAFE_RANGE
+};
 
 typedef struct {
   bool is_press_action;
@@ -38,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,            KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,   
     KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,                      KC_TRNS,  KC_TRNS,  KC_TRNS,  
     KC_TRNS,            KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,  RGB_VAI,            KC_TRNS,  KC_TRNS,  KC_TRNS,  KC_TRNS,   
-    KC_TRNS,  KC_TRNS,  KC_TRNS,                      RESET,                                  KC_TRNS,  KC_TRNS,  KC_TRNS,  RGB_RMOD, RGB_VAD,  RGB_MOD,            KC_TRNS,  KC_TRNS)  
+    KC_TRNS,  WINLOCK,  KC_TRNS,                      RESET,                                  KC_TRNS,  KC_TRNS,  KC_TRNS,  RGB_RMOD, RGB_VAD,  RGB_MOD,            KC_TRNS,  KC_TRNS)  
 
 };
 
@@ -130,6 +135,12 @@ bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
   }
 
   switch (keycode) {
+    case KC_LGUI:
+      if (!winkey_enable) return false;
+      return true;
+    case WINLOCK:
+      if (record->event.pressed) winkey_enable = !winkey_enable;
+      return false;
     case KC_TRNS:
     case KC_NO:
       /* Always cancel one-shot layer when another key gets pressed */
